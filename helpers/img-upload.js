@@ -6,11 +6,11 @@ const imageStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     let folder = "";
 
-    console.log(req)
+    console.log(req);
 
-    if (req.baseUrl.includes('documento')) {
+    if (req.baseUrl.includes("documento")) {
       folder = "documento";
-    } else if (req.baseUrl.includes('usuarios')) {
+    } else if (req.baseUrl.includes("perfil")) {
       folder = "avatar";
     }
     cb(null, `public/images/${folder}/`);
