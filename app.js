@@ -6,8 +6,7 @@ const cors = require('cors')
 
 require('dotenv').config();
 
-const rotaUsuario = require('./routes/usuarios')
-const rotaLogin = require('./routes/login')
+const rotas = require('./routes/routes')
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,8 +28,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/usuario', rotaUsuario);
-app.use('/login', rotaLogin);
+app.use('/api', rotas);
 
 
 app.get('/api/test', (req,res) => {
@@ -45,13 +43,13 @@ app.use((req, res, next) => {
     next(erro);
 });
 
-app.use((error, req, res, next) => {
+/* app.use((error, req, res, next) => {
     res.status(error.status || 500)
     return res.send({
         erro: {
             mensagem: error.mensagem
         }
     })
-});
+}); */
 
 module.exports = app;

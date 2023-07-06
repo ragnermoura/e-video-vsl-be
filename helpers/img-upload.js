@@ -4,16 +4,8 @@ const path = require("path");
 // Destination to store image
 const imageStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let folder = "";
-
-    console.log(req);
-
-    if (req.baseUrl.includes("documento")) {
-      folder = "documento";
-    } else if (req.baseUrl.includes("perfil")) {
-      folder = "avatar";
-    }
-    cb(null, `public/images/${folder}/`);
+    
+    cb(null, `public/thumbs`);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -23,7 +15,7 @@ const imageStorage = multer.diskStorage({
 const imageUpload = multer({
   storage: imageStorage,
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(png|jpg|pdf|jpeg)$/)) {
+    if (!file.originalname.match(/\.(png|jpg|jpeg|webp)$/)) {
       // upload only png and jpg format
       return cb(new Error("Por favor, envie apenas png ou jpg!"));
     }

@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Usuario = require("../models/tb_usuarios");
+const Usuario = require("../models/tb_usuario");
 
 router.post("/", (req, res, next) => {
   Usuario.findOne({ where: { email: req.body.email } })
@@ -24,9 +24,8 @@ router.post("/", (req, res, next) => {
               nome: user.nome,
               sobrenome: user.sobrenome,
               email: user.email,
-              senha: user.senha,
-              id_nivel: user.id_nivel,
-              id_status: user.id_status,
+              nivel: user.nivel,
+              status: user.status,
             },
             process.env.JWT_KEY,
             {
@@ -37,6 +36,7 @@ router.post("/", (req, res, next) => {
           return res.status(200).send({
             mensagem: "Autenticado com sucesso!",
             token: token,
+            user_id: user.id_user
           });
         }
         return res.status(401).send({ mensagem: "Falha na autenticação." });

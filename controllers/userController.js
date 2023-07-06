@@ -78,8 +78,6 @@ const cadastrarUsuario = async (req, res, next) => {
       sobrenome: req.body.sobrenome,
       email: req.body.email,
       senha: hashedPassword,
-      id_status: req.body.status,
-      id_nivel: req.body.nivel,
     });
     const response = {
       mensagem: "Usuário cadastrado com sucesso",
@@ -98,7 +96,8 @@ const cadastrarUsuario = async (req, res, next) => {
 
     return res.status(202).send(response);
   } catch (error) {
-    return res.status(500).send({ error: error.message });
+    /* console.log(error)
+    return res.status(500).send({ error: error.message }); */
   }
 };
 

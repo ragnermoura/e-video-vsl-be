@@ -1,10 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
 const conn = require("../db/conn");
-
-const nivel = require("./tb_nivel");
-
-
 const Usuario = conn.define(
   "tb_usuarios",
   {
@@ -31,27 +27,19 @@ const Usuario = conn.define(
       type: Sequelize.STRING,
       allowNull: false,
     },
-    id_nivel: {
-      type: Sequelize.INTEGER,
+    nivel: {
+      type: Sequelize.STRING,
+      defaultValue: 'C',
       allowNull: true,
     },
-    id_status: {
-      type: Sequelize.INTEGER,
+    status: {
+      type: Sequelize.STRING,
+      defaultValue: 'A',
       allowNull: true,
     },
   },
   { freezeTableName: true }
 );
-
-
-
-Usuario.belongsTo(nivel, {
-  foreignKey: "id_nivel",
-  constraints: true,
-  foreignKeyConstraint: "id_nivel",
-});
-
-
 
 
 module.exports = Usuario;

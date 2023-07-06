@@ -4,13 +4,7 @@ const path = require("path");
 // Destination to store video
 const videoStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let folder = "";
-    if (req.baseUrl.includes("videos")) {
-      folder = "videos";
-    } else if (req.baseUrl.includes("usuarios")) {
-      folder = "avatar";
-    }
-    cb(null, `public/videos/${folder}/`);
+    cb(null, `public/videos/`);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
