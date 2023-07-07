@@ -34,6 +34,7 @@ router.post("/", (req, res, next) => {
           );
 
           return res.status(200).send({
+            success: true,
             mensagem: "Autenticado com sucesso!",
             token: token,
             user_id: user.id_user

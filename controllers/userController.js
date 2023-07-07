@@ -80,6 +80,7 @@ const cadastrarUsuario = async (req, res, next) => {
       senha: hashedPassword,
     });
     const response = {
+      success: true,
       mensagem: "Usuário cadastrado com sucesso",
       usuarioCriado: {
         id_user: novoUsuario.id_user,
