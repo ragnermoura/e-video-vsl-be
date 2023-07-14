@@ -86,7 +86,7 @@ const cadastrarVideos = async (req, res, next) => {
         
     const video = {
       id_user: id, 
-      video: `http://localhost:3000/videos/${filename}`,
+      video: `https://api.evideovsl.com.br/videos/${filename}`,
       cor,
       text
     }
