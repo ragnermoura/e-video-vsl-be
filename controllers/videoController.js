@@ -47,7 +47,7 @@ const obterVideoPorId = async (req, res, next) => {
 // Cadastra um novo Video
 const cadastrarVideos = async (req, res, next) => {
   try {
-    const { id, cor, text } = req.body
+    const { id, cor, text , corBarra, corText} = req.body
 
     if(!id){
       return res.status(422).json({
@@ -57,6 +57,18 @@ const cadastrarVideos = async (req, res, next) => {
     }
 
     if(!cor){
+      return res.status(422).json({
+        success: false,
+        messsage: 'A cor é um campo obrigatório'
+      })
+    }
+    if(!corBarra){
+      return res.status(422).json({
+        success: false,
+        messsage: 'A cor é um campo obrigatório'
+      })
+    }
+    if(!corText){
       return res.status(422).json({
         success: false,
         messsage: 'A cor é um campo obrigatório'

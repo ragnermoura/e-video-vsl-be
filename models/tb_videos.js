@@ -23,13 +23,17 @@ const Video = conn.define(
       type: DataTypes.STRING(7),
       allowNull: false,
     },
+    corBar: {
+      type: DataTypes.STRING(7),
+      allowNull: false,
+    },
+    corText: {
+      type: DataTypes.STRING(7),
+      allowNull: false,
+    },
     text: {
       type: DataTypes.STRING(20),
       allowNull: false,
-    },
-    id_user: {
-      type: DataTypes.INTEGER(),
-      allowNull: true,
     },
   },
   { freezeTableName: true }

@@ -87,11 +87,7 @@ const cadastrarUsuario = async (req, res, next) => {
         nome: novoUsuario.nome,
         email: novoUsuario.email,
         nivel: novoUsuario.id_nivel,
-        request: {
-          tipo: "GET",
-          descricao: "Pesquisar um usuário",
-          url: `http://localhost:3000/usuarios/${novoUsuario.id_user}`,
-        },
+       
       },
     };
 

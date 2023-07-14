@@ -5,8 +5,8 @@ const Usuario = conn.define(
   "tb_usuarios",
   {
     id_user: {
-      type: Sequelize.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING(),
+      defaultValue: DataTypes.UUIDV4(),
       allowNull: false,
       primaryKey: true,
     },

@@ -1,4 +1,5 @@
-const { Client, PlansController } = require("pargamesdk");
+const Plano = require("../../../models/tb_planos");
+
 require("dotenv").config();
 
 module.exports = class PlanController {
@@ -13,12 +14,13 @@ module.exports = class PlanController {
       entrega,
       parcelas,
       intervalo,
-      intervalCount,
-      billingDays,
-      billingType,
+      interval_count,
+      billing_days,
+      billing_type,
       metadata,
       priceScheme,
       quantidade,
+      limit
     } = req.body;
 
     if (!descricao) {
@@ -52,6 +54,14 @@ module.exports = class PlanController {
       return;
     }
 
+    if (!limit) {
+      res.status(422).json({
+        success: false,
+        message: "O limite de upload do plano é necessário",
+      });
+      return;
+    }
+
     if (!metodos) {
       res.status(422).json({
         success: false,
@@ -59,7 +69,7 @@ module.exports = class PlanController {
       });
       return;
     }
-
+/* 
     if (!free_days && free_days < 1 ) {
       res.status(422).json({
         success: false,
@@ -67,8 +77,8 @@ module.exports = class PlanController {
       });
       return;
     }
-
-    if (!intervalCount) {
+ */
+    if (!interval_count) {
       res.status(422).json({
         success: false,
         message:
@@ -93,7 +103,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!billingType) {
+    if (!billing_type) {
       res.status(422).json({
         success: false,
         message: "Escolha entre pagamento pré-pago, pós-pago ou dia exato",
@@ -103,7 +113,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!billingDays && billingType === "exact_day") {
+    if (!billing_days && billing_type === "exact_day") {
       res.status(422).json({
         success: false,
         message: "selecione as datas para pagamento exato",
@@ -119,7 +129,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!priceScheme?.schemeType) {
+    if (!priceScheme?.scheme_type) {
       res.status(422).json({
         success: false,
         message: "Escolha o tipo do plano sé unidade, pacote, volume e tier",
@@ -129,7 +139,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!priceScheme?.price && priceScheme?.schemeType === "unit") {
+    if (!priceScheme?.price && priceScheme?.scheme_type === "unit") {
       res.status(422).json({
         success: false,
         message: "Como escolheu a opção unit selecione o preço",
@@ -137,7 +147,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!quantidade && priceScheme?.schemeType === "unit") {
+    if (!quantidade && priceScheme?.scheme_type === "unit") {
       res.status(422).json({
         success: false,
         message:
@@ -146,7 +156,7 @@ module.exports = class PlanController {
       return;
     }
 
-    if (!priceScheme?.priceBrackets && priceScheme?.schemeType !== "unit") {
+    if (!priceScheme?.price_brackets && priceScheme?.scheme_type !== "unit") {
       res.status(422).json({
         success: false,
         message:
@@ -164,22 +174,22 @@ module.exports = class PlanController {
     const plan = {
       name: nome,
       description: descricao,
-      statementDescriptor: descricao_extrato_cartao,
-      paymentMethods: metodos,
-      trialPeriodDays: free_days,
+      statement_descriptor: descricao_extrato_cartao,
+      payment_methods: metodos,
+      /* trial_period_days: free_days, */
       metadata: metadata === undefined ? {} : metadata,
       items: items === undefined ? [] : items,
       currency: "BRL",
       shippable: entrega,
       installments: parcelas,
       interval: intervalo,
-      intervalCount,
-      billingType,
-      billingDays: billingDays === undefined ? [] : billingDays,
-      pricingScheme: priceScheme,
+      interval_count,
+      billing_type,
+      billing_days: billing_days === undefined ? [] : billing_days,
+      pricing_scheme: priceScheme,
       quantity: quantidade,
     };
-
+/* 
     const client = new Client({
       timeout: 0,
       basicAuthUserName: process.env.PAGARME_API_KEY,
@@ -188,15 +198,39 @@ module.exports = class PlanController {
 
     const Plans = new PlansController(client);
 
-    const plans = await Plans.createPlan(plan);
+    const plans = await Plans.createPlan(plan); */
 
-    /* 
-            const newPlan = await pagarmeClient.plans.create(plan) */
+
+    const reqPlan = await fetch('https://api.pagar.me/core/v5/plans', {
+      method: 'POST',
+      headers: {
+          accept: 'application/json',
+  'content-type': 'application/json',
+  'Authorization': `Basic ${Buffer.from(process.env.PAGARME_API_KEY + ':').toString('base64')}`
+      },
+      body: JSON.stringify(plan)
+  })
+
+  console.log('request',reqPlan)
+
+  const newPlan= await reqPlan?.json()
+
+  
+  const body = {
+    id_plano_pagarme : newPlan?.id,
+    nome_plano: nome,
+    descricao: descricao,
+    limit,
+    preco: (priceScheme?.price)/100,
+    metodos_pagamento: metodos?.join(', ')
+  }
+
+  await Plano.create(body)
 
     res.status(200).json({
       success: true,
       message: "Plano criado com sucesso",
-      plano: plans?.result,
+      plano: newPlan,
     });
   }
 };
