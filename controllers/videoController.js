@@ -88,7 +88,9 @@ const cadastrarVideos = async (req, res, next) => {
       id_user: id, 
       video: `https://api.evideovsl.com.br/videos/${filename}`,
       cor,
-      text
+      text,
+      corBar: corBarra,
+      corText: corText,
     }
     console.log('body', video)
     const novoVideo = await Video.create(video);
