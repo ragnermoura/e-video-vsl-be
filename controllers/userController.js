@@ -62,6 +62,44 @@ const excluirUsuario = async (req, res, next) => {
 // Cria um novo usuário
 const cadastrarUsuario = async (req, res, next) => {
   try {
+
+ 
+    const { nome, sobrenome, email, senha } = req?.body
+
+    
+    if (!nome) {
+      res.status(422).json({
+        success: false,
+        message: "O nome é um campo obrigatório",
+      });
+      return;
+    }
+
+    if (!sobrenome) {
+      res.status(422).json({
+        success: false,
+        message: "O sobrenome é um campo obrigatório",
+      });
+      return;
+    }
+
+    if (!email) {
+      res.status(422).json({
+        success: false,
+        message: "O email é um campo obrigatório",
+      });
+      return;
+    }
+
+    if (!senha) {
+      res.status(422).json({
+        success: false,
+        message: "A senha é um campo obrigatório",
+      });
+      return;
+    }
+
+
     const usuarioExistente = await User.findOne({
       where: { email: req.body.email },
     });
