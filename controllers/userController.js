@@ -101,7 +101,7 @@ const cadastrarUsuario = async (req, res, next) => {
 
 
     const usuarioExistente = await User.findOne({
-      where: { email: req.body.email },
+      where: { email: email },
     });
     if (usuarioExistente) {
       return res
@@ -110,13 +110,14 @@ const cadastrarUsuario = async (req, res, next) => {
           mensagem: "Email já cadastrado, por favor insira um email diferente!",
         });
     }
-    const hashedPassword = await bcrypt.hash(req.body.senha, 10);
+    const hashedPassword = await bcrypt.hash( senha, 10);
     const novoUsuario = await User.create({
-      nome: req.body.nome,
-      sobrenome: req.body.sobrenome,
-      email: req.body.email,
+      nome: nome,
+      sobrenome: sobrenome,
+      email: email,
       senha: hashedPassword,
     });
+
     const response = {
       success: true,
       mensagem: "Usuário cadastrado com sucesso",
@@ -131,8 +132,8 @@ const cadastrarUsuario = async (req, res, next) => {
 
     return res.status(202).send(response);
   } catch (error) {
-    /* console.log(error)
-    return res.status(500).send({ error: error.message }); */
+    console.log(error)
+    return res.status(500).send({ error: error.message });
   }
 };
 

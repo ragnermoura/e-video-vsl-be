@@ -31,7 +31,11 @@ const Video = conn.define(
       type: DataTypes.STRING(7),
       allowNull: false,
     },
-    text: {
+    textSuperior: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+    },
+    textInferior: {
       type: DataTypes.STRING(20),
       allowNull: false,
     },

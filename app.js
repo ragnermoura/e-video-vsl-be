@@ -9,8 +9,8 @@ require('dotenv').config();
 const rotas = require('./routes/routes')
 
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(cors())
 
 app.use((req, res, next) => {

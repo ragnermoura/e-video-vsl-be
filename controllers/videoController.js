@@ -47,40 +47,35 @@ const obterVideoPorId = async (req, res, next) => {
 // Cadastra um novo Video
 const cadastrarVideos = async (req, res, next) => {
   try {
-    const { id, cor, text , corBarra, corText} = req.body
+    const { id, cor, textInferior, textSuperior , corBarra, corText} = req.body
 
     if(!id){
       return res.status(422).json({
         success: false,
-        messsage: 'O id é um campo obrigatório'
+        message: 'O id é um campo obrigatório'
       })
     }
 
     if(!cor){
       return res.status(422).json({
         success: false,
-        messsage: 'A cor é um campo obrigatório'
+        message: 'A cor é um campo obrigatório'
       })
     }
     if(!corBarra){
       return res.status(422).json({
         success: false,
-        messsage: 'A cor é um campo obrigatório'
+        message: 'A cor é um campo obrigatório'
       })
     }
     if(!corText){
       return res.status(422).json({
         success: false,
-        messsage: 'A cor é um campo obrigatório'
+        message: 'A cor é um campo obrigatório'
       })
     }
 
-    if(!text){
-      return res.status(422).json({
-        success: false,
-        messsage: 'O texto é um campo obrigatório'
-      })
-    }
+   
 
     const { filename } = req.file
         
@@ -88,7 +83,8 @@ const cadastrarVideos = async (req, res, next) => {
       id_user: id, 
       video: `https://api.evideovsl.com.br/videos/${filename}`,
       cor,
-      text,
+      textSuperior,
+      textInferior,
       corBar: corBarra,
       corText: corText,
     }
@@ -105,12 +101,64 @@ const cadastrarVideos = async (req, res, next) => {
   }
 };
 
+const updateVideos = async (req, res, next) => {
+  try {
+    const { id_video, cor, textInferior, textSuperior , corBarra, corText} = req.body
+
+    if(!cor){
+      return res.status(422).json({
+        success: false,
+        message: 'A cor é um campo obrigatório'
+      })
+    }
+    if(!corBarra){
+      return res.status(422).json({
+        success: false,
+        message: 'A cor é um campo obrigatório'
+      })
+    }
+    if(!corText){
+      return res.status(422).json({
+        success: false,
+        message: 'A cor é um campo obrigatório'
+      })
+    }
+
+   
+
+    const { filename } = req.file
+        
+    const video = {
+      cor,
+      textSuperior,
+      textInferior,
+      corBar: corBarra,
+      thumb: `https://api.evideovsl.com.br/thumbs/${filename}`,
+      corText: corText,
+    }
+    console.log('body', video)
+    const novoVideo = await Video.update(video, {
+      where: {
+        id_video: id_video
+      }
+    });
+    return res.status(201).send({
+      success: true,
+      mensagem: 'Video cadastrado com sucesso!',
+      video: novoVideo,
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({ error: error.message });
+  }
+};
+
 const uploadImage = async (req, res, next) => {
   const { id_video } = req.params
 
     const { filename } = req.file
     const update = {
-      thumb: `http://localhost:3000/thumbs/${filename}`
+      thumb: `https://api.evideovsl.com.br/thumbs/${filename}`
     }
     await Video.update(update, {
       where: {
@@ -162,6 +210,7 @@ module.exports = {
   obterVideoPorIdUser,
   cadastrarVideos,
   editarVideo,
+  updateVideos,
   excluirVideo,
   uploadImage,
   obterVideoPorId
