@@ -64,7 +64,7 @@ const cadastrarUsuario = async (req, res, next) => {
   try {
 
  
-    const { nome, sobrenome, email, senha } = req?.body
+    const { nome, sobrenome, email, senha } = req.body
 
     
     if (!nome) {
@@ -107,7 +107,7 @@ const cadastrarUsuario = async (req, res, next) => {
       return res
         .status(409)
         .send({
-          mensagem: "Email já cadastrado, por favor insira um email diferente!",
+          message: "Email já cadastrado, por favor insira um email diferente!",
         });
     }
     const hashedPassword = await bcrypt.hash( senha, 10);
