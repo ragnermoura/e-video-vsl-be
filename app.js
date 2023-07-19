@@ -11,6 +11,12 @@ const rotas = require('./routes/routes')
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.use( (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://app.evideovsl.com.br');
+    next()
+})
+
 app.use(cors())
 
 app.use((req, res, next) => {
