@@ -3,6 +3,7 @@ const subscription = require('./subscription')
 const rotaLogin = require('./login')
 const usuario = require('./usuarios')
 const videosRoutes = require('./video')
+const webhookRoutes = require('./webhook')
 
 const router = require("express").Router();
 
@@ -11,5 +12,6 @@ router.use('/subscription', subscription)
 router.use('/login',rotaLogin)
 router.use('/usuario',usuario)
 router.use('/videos', videosRoutes)
+router.use('/webhook', webhookRoutes)
 
 module.exports = router
