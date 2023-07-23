@@ -13,4 +13,5 @@ routes.get('/get-by-id/:id_video', VideoController.obterVideoPorId)
 routes.post('/upload-video',  videoUpload.single('video'), VideoController.cadastrarVideos)
 routes.patch('/upload-image/:id_video', imageUpload.single('thumb'), VideoController.uploadImage)
 routes.patch('/upload/:id_video', imageUpload.single('thumb'), VideoController.updateVideos)
+routes.get('/streaming/:id_video', VideoController.streamingVideo)
 module.exports = routes

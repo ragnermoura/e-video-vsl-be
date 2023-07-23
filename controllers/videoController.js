@@ -1,5 +1,5 @@
 const Video = require('../models/tb_videos');
-
+const fs = require('fs')
 // Obtém todos os status
 const obterVideos = async (req, res, next) => {
   try {
@@ -44,6 +44,54 @@ const obterVideoPorId = async (req, res, next) => {
     return res.status(500).send({ error: error.message });
   }
 };
+
+const streamingVideo = async (req, res, next) => {
+
+const range = req.headers.range;
+const {id_video} = req.params
+if(!range){
+  return res.status(400).json({message: 'É necessário o envio do range'})
+}
+if(!id_video){
+  return res.status(400).json({message: 'É necessário o envio do id do video'})
+}
+
+const videos = await Video.findOne({
+  where: {
+    id_video
+  }
+});
+if (!videos) {
+  return res.status(404).send({ mensagem: 'videos não encontrados' });
+}
+
+
+const videoPath = videos.video
+const videoSize = fs.statSync(videoPath).size
+console.log(videoSize)
+
+const CHUNK_SIZE = 10**6
+
+const start = Number(range.replace(/\D/g, ""))
+const end = Math.min(start + CHUNK_SIZE, videoSize -1)
+
+const contentLength = end - start + 1
+
+const headers = {
+  "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+  "Accept-Ranges": "bytes",
+  "Content-Length": contentLength,
+  "Content-Type": "video/mp4" 
+}
+
+res.writeHead(206, headers)
+
+const videoStream = fs.createReadStream(videoPath, {start, end});
+
+videoStream.pipe(res)
+
+
+}
 // Cadastra um novo Video
 const cadastrarVideos = async (req, res, next) => {
   try {
@@ -65,7 +113,7 @@ const cadastrarVideos = async (req, res, next) => {
     if(!corBarra){
       return res.status(422).json({
         success: false,
-        message: 'A cor é um campo obrigatório'
+        message: 'A cor da barra é um campo obrigatório'
       })
     }
     if(!corText){
@@ -77,12 +125,13 @@ const cadastrarVideos = async (req, res, next) => {
 
    
 
-    const { filename } = req.file
-        
+    const { filename, originalname } = req.file
+        console.log(originalname.split('.mp4').join(''))
     const video = {
       id_user: id, 
-      video: `https://api.evideovsl.com.br/videos/${filename}`,
+      video: `public/videos/${filename}`,
       cor,
+      nomeVideo: originalname.split('.mp4').join(''),
       textSuperior,
       textInferior,
       corBar: corBarra,
@@ -213,5 +262,6 @@ module.exports = {
   updateVideos,
   excluirVideo,
   uploadImage,
-  obterVideoPorId
+  obterVideoPorId,
+  streamingVideo
 };

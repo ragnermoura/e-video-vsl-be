@@ -15,6 +15,9 @@ const Video = conn.define(
       type: DataTypes.STRING(),
       allowNull: false,
     },
+    nomeVideo: {type: DataTypes.STRING(),
+      allowNull: false,},
+
     thumb: {
       type: DataTypes.STRING(),
       allowNull: true,
