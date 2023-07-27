@@ -1,5 +1,9 @@
 const multer = require("multer");
+const multerS3 = require("multer-s3");
 const path = require("path");
+const fs = require('fs');
+const s3Client = require("./awsS3");
+
 
 // Destination to store video
 const videoStorage = multer.diskStorage({
@@ -7,12 +11,22 @@ const videoStorage = multer.diskStorage({
     cb(null, `public/videos/`);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + '-' +(file.originalname));
   },
 });
 
 const videoUpload = multer({
-  storage: videoStorage,
+  storage: multerS3({
+    s3: s3Client,
+    bucket: 'evideovsl',
+    acl: 'public-read',
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now() + '-' +(file.originalname)); // O caminho (key) do objeto no S3
+    }
+  }),
   limits: {
     fileSize: 800 * 1024 * 1024, // 800MB in bytes
   },

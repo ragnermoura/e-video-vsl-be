@@ -1,5 +1,10 @@
 const Video = require('../models/tb_videos');
+const cacheManager = require('cache-manager');
+const fsBinary = require('cache-manager-fs-binary');
+const rangeParser = require('range-parser');
 const fs = require('fs')
+
+
 // Obtém todos os status
 const obterVideos = async (req, res, next) => {
   try {
@@ -47,12 +52,11 @@ const obterVideoPorId = async (req, res, next) => {
 
 const streamingVideo = async (req, res, next) => {
 
-const range = req.headers.range;
 const {id_video} = req.params
-if(!range){
+/* if(!range){
   return res.status(400).json({message: 'É necessário o envio do range'})
-}
-if(!id_video){
+} */
+/* if(!id_video){
   return res.status(400).json({message: 'É necessário o envio do id do video'})
 }
 
@@ -64,15 +68,36 @@ const videos = await Video.findOne({
 if (!videos) {
   return res.status(404).send({ mensagem: 'videos não encontrados' });
 }
+ */
+
+const cache = await cacheManager.caching('memory', {
+  ttl: 3600,
+  
+})
+const cacheKey = `video:${req.url}`
+
+const cachedContent = await cache.get(cacheKey);
 
 
-const videoPath = videos.video
+
+
+if(cachedContent){
+  console.log('to no cache')
+    res.setHeader('Content-Length', cachedContent.length);
+      res.setHeader('Content-Type', 'video/mp4');
+      res.send(cachedContent);
+  
+  } else {
+
+    console.log('sem cache')
+const range = req.headers.range;
+const videoPath = `public/videos/1690315231104-K a m a i t a c h i - Julieta (Prod.MarcusMaia).mp4`
 const videoSize = fs.statSync(videoPath).size
 console.log(videoSize)
 
 const CHUNK_SIZE = 10**6
 
-const start = Number(range.replace(/\D/g, ""))
+const start = Number(range?.replace(/\D/g, "")) || 0
 const end = Math.min(start + CHUNK_SIZE, videoSize -1)
 
 const contentLength = end - start + 1
@@ -90,7 +115,18 @@ const videoStream = fs.createReadStream(videoPath, {start, end});
 
 videoStream.pipe(res)
 
+const buffer = [];
+videoStream.on('data', (chunk) => {
+  buffer.push(chunk);
+});
 
+videoStream.on('end', async () => {
+  console.log('cacheKey finalizado', cacheKey)
+  const fullContent = Buffer.concat(buffer);
+  await cache.set(cacheKey, fullContent);
+});
+
+}
 }
 // Cadastra um novo Video
 const cadastrarVideos = async (req, res, next) => {
@@ -125,11 +161,11 @@ const cadastrarVideos = async (req, res, next) => {
 
    
 
-    const { filename, originalname } = req.file
+    const { key, originalname } = req.file
         console.log(originalname.split('.mp4').join(''))
     const video = {
       id_user: id, 
-      video: `public/videos/${filename}`,
+      video: `https://d2m8de8rs35eit.cloudfront.net/${key}`,
       cor,
       nomeVideo: originalname.split('.mp4').join(''),
       textSuperior,
