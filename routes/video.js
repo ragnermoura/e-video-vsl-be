@@ -8,6 +8,8 @@ const { videoUpload } = require('../helpers/video-upload')
 const Plano = require('../models/tb_planos')
 const Assinatura_User = require('../models/tb_user_assinatura')
 const Video = require('../models/tb_videos')
+const ffmpeg = require('fluent-ffmpeg')
+const fs = require('fs')
 
 const handleAwsS3 = async(req, res ) => { 
 
@@ -47,11 +49,64 @@ const {text} = req.body
 
  }
 
+ async function uploadImageToS3(imageData, req) {
+  try {
+    const params = {
+      Bucket: "evideovsl", 
+      Key:  `${req.file.key.split('.mp4').join('')}_frame.jpg`,
+      Body: imageData,
+      ACL: 'public-read'
+    };
+
+    await s3Client.send(new PutObjectCommand(params));
+    console.log('Imagem enviada com sucesso para o Amazon S3!');
+  } catch (error) {
+    console.error('Erro ao enviar a imagem para o Amazon S3:', error);
+  }
+}
+ 
+ 
+ const handleSavePrint = async (req, res, next) => {
+  try {
+    const videoS3Path = `https://evideovsl.s3.sa-east-1.amazonaws.com/${req.file.key.split(' ').join('+')}`;
+    const imageData = await new Promise((resolve, reject) => {
+      ffmpeg(videoS3Path)
+        .screenshots({
+          count: 1,
+          timestamps: ['00:00:00'], // Timestamp do frame inicial
+          filename: 'image.jpg',
+        })
+        .on('error', (err) => {
+          console.error('Erro ao extrair o frame inicial:', err);
+          reject(err);
+        })
+        .on('end', () => {
+          console.log('Extração do frame inicial concluída!');
+          // Leitura do arquivo de imagem extraído em memória
+          const fileContent = fs.readFileSync('image.jpg');
+          resolve(fileContent);
+        });
+    });
+
+    // Chama a função para enviar a imagem para o S3
+    await uploadImageToS3(imageData, req);
+
+    fs.unlinkSync('image.jpg');
+    next()
+    // Apaga o arquivo de imagem temporário após o envio para o S3
+  } catch (error) {
+    console.error('Erro durante o processo:', error);
+  }
+}
+
+
+
+
 const upload = videoUpload.single('video')
 routes.get('/get/:id_user', VideoController.obterVideoPorIdUser)
 routes.post('/get-aws', handleAwsS3)
 routes.get('/get-by-id/:id_video', VideoController.obterVideoPorId)
-routes.post('/upload-video', upload , VideoController.cadastrarVideos)
+routes.post('/upload-video', upload, handleSavePrint, VideoController.cadastrarVideos)
 routes.patch('/upload-image/:id_video', imageUpload.single('thumb'), VideoController.uploadImage)
 routes.patch('/upload/:id_video', imageUpload.single('thumb'), VideoController.updateVideos)
 routes.get('/streaming/:id_video', VideoController.streamingVideo)

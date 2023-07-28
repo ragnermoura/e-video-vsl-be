@@ -22,6 +22,10 @@ const Video = conn.define(
       type: DataTypes.STRING(),
       allowNull: true,
     },
+    frame: {
+      type: DataTypes.STRING(),
+      allowNull: true,
+    },
     cor: {
       type: DataTypes.STRING(7),
       allowNull: false,

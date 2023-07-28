@@ -165,7 +165,8 @@ const cadastrarVideos = async (req, res, next) => {
         console.log(originalname.split('.mp4').join(''))
     const video = {
       id_user: id, 
-      video: `https://d2m8de8rs35eit.cloudfront.net/${key}`,
+      video: `https://d2m8de8rs35eit.cloudfront.net/${key.split(' ').join('+')}`,
+      frame: `https://d2m8de8rs35eit.cloudfront.net/${key.split('.mp4').join('').split(' ').join('+')}_frame.jpg`,
       cor,
       nomeVideo: originalname.split('.mp4').join(''),
       textSuperior,
@@ -241,9 +242,9 @@ const updateVideos = async (req, res, next) => {
 const uploadImage = async (req, res, next) => {
   const { id_video } = req.params
 
-    const { filename } = req.file
+    const { key } = req.file
     const update = {
-      thumb: `https://api.evideovsl.com.br/thumbs/${filename}`
+      thumb: `https://d2m8de8rs35eit.cloudfront.net/${key}`
     }
     await Video.update(update, {
       where: {
