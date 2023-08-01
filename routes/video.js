@@ -100,14 +100,22 @@ const {text} = req.body
 }
 
 
+const verifyVideoUser = async(req,res,next) => {
+    const {id_user} = req.params
+    const data = await Video?.findAll({where: {
+      id_user: id_user
+    }})
 
+    res.status(200).json({success: true, message: 'seus videos', video: data})
+}
 
 const upload = videoUpload.single('video')
 routes.get('/get/:id_user', VideoController.obterVideoPorIdUser)
 routes.post('/get-aws', handleAwsS3)
 routes.get('/get-by-id/:id_video', VideoController.obterVideoPorId)
-routes.post('/upload-video', upload, handleSavePrint, VideoController.cadastrarVideos)
+routes.post('/upload-video/:id_user', /* verifyVideoUser, */  upload, handleSavePrint, VideoController.cadastrarVideos)
 routes.patch('/upload-image/:id_video', imageUpload.single('thumb'), VideoController.uploadImage)
 routes.patch('/upload/:id_video', imageUpload.single('thumb'), VideoController.updateVideos)
+routes.delete('/delete/:id_video', VideoController.excluirVideo)
 routes.get('/streaming/:id_video', VideoController.streamingVideo)
 module.exports = routes

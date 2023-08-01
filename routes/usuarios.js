@@ -62,5 +62,6 @@ router.patch('/:id_user', async (req, res, next) => {
 
   
 router.post('/cadastro', UserController.cadastrarUsuario)
+router.patch('/senha', UserController.changePassword)
  
 module.exports = router

@@ -4,6 +4,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/tb_usuario");
+const Assinatura_User = require("../models/tb_user_assinatura");
+const { where } = require("sequelize");
 
 router.post("/", async (req, res, next) => {
   await Usuario.findOne({ where: { email: req.body.email } })
@@ -33,12 +35,19 @@ router.post("/", async (req, res, next) => {
             }
           );
 
+            const plano_user = await Assinatura_User.findOne({where: {
+              id_user: user?.id_user
+            }} )
+
+          
+
       return res.status(200).send({
         success: true,
         mensagem: "Autenticado com sucesso!",
         token: token,
         user_id: user.id_user,
-        name: user?.nome
+        user: user,
+        plano: plano_user
       });
   }
         return res.status(401).send({ mensagem: "Falha na autenticação." });

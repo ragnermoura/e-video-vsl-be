@@ -278,13 +278,15 @@ const editarVideo = async (req, res, next) => {
 // Exclui um video existente
 const excluirVideo = async (req, res, next) => {
   try {
-    const videos = await Video.findByPk(req.body.id_video);
+    const { id_video } = req.params
+    const videos = await Video.findByPk(req.params.id_video);
     if (!videos) {
       return res.status(404).send({ mensagem: 'Video não encontrado' });
     }
-    await videos.destroy();
-    return res.status(202).send({
-      mensagem: 'Video excluído com sucesso!',
+    await Video.destroy({where: {id_video: id_video}});
+    return res.status(200).send({
+      success: true,
+      message: 'Video excluído com sucesso!',
     });
   } catch (error) {
     return res.status(500).send({ error: error.message });

@@ -137,10 +137,62 @@ const cadastrarUsuario = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { id_user, senhaAntiga,senha, confirmSenha } = req.body
+
+  if(!senhaAntiga){
+    res.status(422).json({message: 'A senha atual é obrigatória'})
+    return
+}
+  if(!senha){
+    res.status(422).json({message: 'A nova senha é obrigatória'})
+    return
+}
+if(!confirmSenha){
+    res.status(422).json({message: 'A confirmação da senha é obrigatória'})
+    return
+}
+if(confirmSenha !== senha){
+    res.status(422).json({message: 'As senhas não coincidem'})
+    return
+}
+
+const user = await User.findOne({where: {id_user: id_user}})
+
+if(!user){
+    res.status(422).json({message: 'Usuário não existe'})
+    return
+}
+
+console.log(user?.nome)
+
+const passwordMatch = bcrypt.compareSync(senhaAntiga, user.senha)
+
+if(!passwordMatch){
+    res.status(422).json({message: 'senha antiga invalida'})
+    return
+}
+
+const hashedPassword = await bcrypt.hash( senha, 10);
+
+const body = {
+  senha: hashedPassword
+}
+
+await User.update(body, {where:{id_user: id_user} })
+
+res.status(200).json({
+  success: true,
+  message: 'senha atualizada com sucesso'
+})
+
+}
+
 module.exports = {
   obterUsuarios,
   obterUsuarioPorId,
   atualizarUsuario,
   excluirUsuario,
   cadastrarUsuario,
+  changePassword
 };

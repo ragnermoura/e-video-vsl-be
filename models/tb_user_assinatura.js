@@ -12,11 +12,15 @@ const Assinatura_User = conn.define(
       allowNull: false,
       primaryKey: true,
     },
-    id_assinatura: {
-      type: DataTypes.STRING(),
+  plano: {
+    type: DataTypes.STRING(),
+    allowNull: false
+  },
+    nome_plano: {
+        type: DataTypes.STRING(),
       allowNull: false,
     },
-    id_plano: {
+    nome_plano_marketPlace: {
         type: DataTypes.STRING(),
       allowNull: false,
     },
@@ -35,12 +39,5 @@ Assinatura_User.belongsTo(usuario, {
   constraints: true,
   foreignKeyConstraint: "id_user",
 });
-
-Assinatura_User.belongsTo(Plano, {
-  foreignKey: 'id_plano_sistema',
-  constraints: true,
-  foreignKeyConstraint: 'id_plano_sistema',
-
-})
 
 module.exports = Assinatura_User;

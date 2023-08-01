@@ -2,6 +2,7 @@ const transporter = require("../../../../helpers/transporter")
 const Assinatura = require("../../../../schemas/assinatura")
 const bcrypt = require('bcrypt')
 const User = require('../../../../models/tb_usuario')
+const Assinatura_User = require("../../../../models/tb_user_assinatura")
 
 module.exports = class SubscribesController{
 
@@ -50,10 +51,10 @@ product: {
               const senhaGerada = gerarSenha(tamanhoSenha);
               console.log("Senha aleatória gerada:", senhaGerada);
               
-        /* 
+        
         const newSubcription = new Assinatura(body)
         
-        await newSubcription.save() */
+        await newSubcription.save()
 
         const userName = data?.last_transaction?.contact?.name.split(' ')
         const nomeUser =userName.shift()
@@ -64,12 +65,20 @@ product: {
             email: data?.last_transaction?.contact?.email,
             senha: hashedPassword
         }
-
-        await User.create(user)
-
+        
+        const userCreated = await User.create(user)
+        
+                const user_assinatura = { 
+                      id_user:  userCreated?.id_user,
+                      plano: data?.name,
+                      nome_plano: data?.last_transaction?.product?.name,
+                    nome_plano_marketPlace: data?.last_transaction?.product?.marketplace_name,
+                }
+                await Assinatura_User.create(user_assinatura)
+                
             transporter.sendMail({
                 from: 'noreply <noreply@evideovsl.com.br>',
-                to: 'vitormouracs@gmail.com',
+                to:`${data?.last_transaction?.contact?.email}`,
                 subject: 'Acesso a plataforma e-video',
                 text: 'Acesso a plataforma e-video',
                 html: `

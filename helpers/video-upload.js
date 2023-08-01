@@ -27,9 +27,6 @@ const videoUpload = multer({
       cb(null, Date.now() + '-' +(file.originalname)); // O caminho (key) do objeto no S3
     }
   }),
-  limits: {
-    fileSize: 800 * 1024 * 1024, // 800MB in bytes
-  },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(mp4|mov|avi|mkv)$/)) {
       // upload only mp4, mov, avi, or mkv format
