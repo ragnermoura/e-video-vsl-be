@@ -35,11 +35,11 @@ product: {
 
         
         try {
-            function gerarSenha(tamanho = 12) {
+            function gerarSenha() {
                 const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
                 let senhaAleatoria = '';
                 
-                for (let i = 0; i < tamanho; i++) {
+                for (let i = 0; i < 12; i++) {
                   const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
                   senhaAleatoria += caracteres.charAt(indiceAleatorio);
                 }
@@ -47,9 +47,8 @@ product: {
                 return senhaAleatoria;
               }
               
-              const tamanhoSenha = 12; // Altere o tamanho da senha conforme sua preferência
-              const senhaGerada = gerarSenha(tamanhoSenha);
-              console.log("Senha aleatória gerada:", senhaGerada);
+             
+              const senhaGerada = gerarSenha();
               
         
         const newSubcription = new Assinatura(body)
@@ -77,7 +76,7 @@ product: {
                 await Assinatura_User.create(user_assinatura)
                 
             transporter.sendMail({
-                from: 'noreply <noreply@evideovsl.com.br>',
+                from: 'Evideo <noreply@evideovsl.com.br>',
                 to:`${data?.last_transaction?.contact?.email}`,
                 subject: 'Acesso a plataforma e-video',
                 text: 'Acesso a plataforma e-video',
@@ -88,6 +87,7 @@ product: {
                 <p>Segue seu login e senha provisório</p>
 
                 <ul>
+                <li>URL de acesso: https://app.evideovsl.com.br/</li>
                 <li>email: ${data?.last_transaction?.contact?.email}</li>
                 <li>senha: ${senhaGerada}</li>
                 </ul>
@@ -103,6 +103,7 @@ product: {
             })
             
         } catch (error) {
+            console.log('err', error)
             res.status(500).json({ message: error })
         }
     }
