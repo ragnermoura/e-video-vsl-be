@@ -189,7 +189,8 @@ const cadastrarVideos = async (req, res, next) => {
 
 const updateVideos = async (req, res, next) => {
   try {
-    const { id_video, cor, textInferior, textSuperior , corBarra, corText} = req.body
+    const {id_video} = req.params
+    const { cor, textInferior, textSuperior , corBarra, corText} = req.body
 
     if(!cor){
       return res.status(422).json({
@@ -209,17 +210,11 @@ const updateVideos = async (req, res, next) => {
         message: 'A cor é um campo obrigatório'
       })
     }
-
-   
-
-    const { filename } = req.file
-        
     const video = {
       cor,
       textSuperior,
       textInferior,
       corBar: corBarra,
-      thumb: `https://api.evideovsl.com.br/thumbs/${filename}`,
       corText: corText,
     }
     console.log('body', video)

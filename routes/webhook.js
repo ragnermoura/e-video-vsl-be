@@ -6,5 +6,6 @@ const routes = require('express').Router()
 
 routes.post('/transaction/receive', TransactionController.create)
 routes.post('/subscription/receive', SubscribesController.create)
+routes.post('/nova-senha', SubscribesController.newPassword)
 
 module.exports = routes 

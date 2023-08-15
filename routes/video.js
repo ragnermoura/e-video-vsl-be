@@ -116,7 +116,7 @@ routes.post('/get-aws', handleAwsS3)
 routes.get('/get-by-id/:id_video', VideoController.obterVideoPorId)
 routes.post('/upload-video/:id_user', /* verifyVideoUser, */  upload, handleSavePrint,VideoController.cadastrarVideos)
 routes.patch('/upload-image/:id_video', imageUpload.single('thumb'), VideoController.uploadImage)
-routes.patch('/upload/:id_video', imageUpload.single('thumb'), VideoController.updateVideos)
+routes.patch('/upload/:id_video', VideoController.updateVideos)
 routes.delete('/delete/:id_video', VideoController.excluirVideo)
 routes.get('/streaming/:id_video', VideoController.streamingVideo)
 module.exports = routes
