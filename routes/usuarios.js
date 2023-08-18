@@ -63,5 +63,8 @@ router.patch('/:id_user', async (req, res, next) => {
   
 router.post('/cadastro', UserController.cadastrarUsuario)
 router.patch('/senha', UserController.changePassword)
- 
+
+router.patch('/send-code', UserController.sendCode)
+router.patch('/validation-code', UserController.validationCode)
+router.patch('/change-password', UserController.forgotPassaword)
 module.exports = router

@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/tb_usuario");
+const transporter = require("../helpers/transporter")
 
 // Obtém todos os usuários
 const obterUsuarios = async (req, res, next) => {
@@ -188,11 +189,180 @@ res.status(200).json({
 
 }
 
+const sendCode = async (req, res) => {
+
+  const { email } = req.body
+
+  if(!email){
+    return res.status(422).json({
+
+      success: false,
+      message: 'o e-mail é necessário para o envio das informações'
+
+    })
+  }
+
+  const user = await User.findOne({where: {email}})
+
+  if(!user){
+    return res.status(422).json({
+
+      success: false,
+      message: 'Não existe cadastro com este e-mail'
+
+    })
+  }
+
+
+  function gerarNumeroQuatroDigitos() {
+    let numero = (Math.random() * 10000).toFixed(0);
+
+    while (numero.length < 4) {
+      numero = (Math.random() * 10000).toFixed(0);
+    }
+
+    return numero;
+  }
+
+  const numeroAleatorio = gerarNumeroQuatroDigitos();
+  console.log(numeroAleatorio);
+
+await User.update({code: numeroAleatorio}, {
+  where: {email}
+})
+
+  transporter.sendMail({
+    from: 'Evideo <noreply@evideovsl.com.br>',
+    to:`${email}`,
+    subject: 'Código de verificação',
+    text: 'Código de verificação',
+    html: `
+
+    <h2>Olá ${user?.nome}, parabéns pela sua compra, seja bem vindo</h2>
+
+    <p>Segue seu código de verificação para alteração de senha</p>
+
+    <ul>
+    
+    <li>código de verificação: ${numeroAleatorio}</li>
+    </ul>
+
+        `
+    })
+
+  res.status(200).json({
+    success: true,
+    user,
+    code: numeroAleatorio
+  })
+
+}
+const validationCode = async (req, res) => {
+  try {
+    const { code, email } = req.body;
+
+    console.log("dados", code, email);
+
+    if (!code) {
+      res.status(422).json({
+        success: false,
+        message: "O código é obrigatório",
+      });
+      return;
+    }
+
+    const user = await User.findOne({
+      where: {
+        email
+      },
+    });
+
+    if (code == user?.code) {
+      await User.update(
+        {
+          code: null,
+        },
+        {
+          where: { email },
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Código validado com sucesso",
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Código invalidado",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: `Ocorreu um erro ${error}`,
+    });
+  }
+}
+const forgotPassaword = async (req, res) => {
+
+  const { email,senha, confirmSenha } = req.body
+
+ 
+  if(!senha){
+    res.status(422).json({message: 'A nova senha é obrigatória'})
+    return
+}
+if(!confirmSenha){
+    res.status(422).json({message: 'A confirmação da senha é obrigatória'})
+    return
+}
+if(confirmSenha !== senha){
+    res.status(422).json({message: 'As senhas não coincidem'})
+    return
+}
+
+const user = await User.findOne({where: {email}})
+
+const comparePass = await bcrypt.compareSync(senha, user.senha)
+
+if(comparePass){
+  res.status(422).json({message: 'Não é possível a mesma senha'})
+  return
+}
+
+if(!user){
+    res.status(422).json({message: 'Usuário não existe'})
+    return
+}
+
+const hashedPassword = await bcrypt.hash( senha, 10);
+
+
+
+const body = {
+  senha: hashedPassword
+}
+
+await User.update(body, {where:{email} })
+
+res.status(200).json({
+  success: true,
+  message: 'senha atualizada com sucesso'
+})
+
+
+}
+
 module.exports = {
   obterUsuarios,
   obterUsuarioPorId,
   atualizarUsuario,
   excluirUsuario,
   cadastrarUsuario,
-  changePassword
+  changePassword,
+  sendCode,
+  validationCode,
+  forgotPassaword
 };

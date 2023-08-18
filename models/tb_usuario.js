@@ -27,6 +27,14 @@ const Usuario = conn.define(
       type: Sequelize.STRING,
       allowNull: false,
     },
+    code: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isNumeric: true,
+        len: [4, 4],
+      },
+    },
     nivel: {
       type: Sequelize.STRING,
       defaultValue: 'C',

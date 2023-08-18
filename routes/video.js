@@ -103,18 +103,34 @@ const {text} = req.body
 
 const verifyVideoUser = async(req,res,next) => {
     const {id_user} = req.params
-    const data = await Video?.findAll({where: {
+    const assinatura = await Assinatura_User.findOne({
+      where: {id_user}
+    })
+    const data = await Video?.count({where: {
       id_user: id_user
     }})
 
-    res.status(200).json({success: true, message: 'seus videos', video: data})
+if(assinatura?.plano === 'Plano Basic' && data === 5) {
+      
+      return res.status(426).json({success: false, message: 'Não é possível subir o video pois você já chegou ao limite do seu plano'})
+    }
+    if(assinatura?.plano === 'Plano Starter' && data === 10) {
+     
+      return res.status(426).json({success: false, message: 'Não é possível subir o video pois você já chegou ao limite do seu plano'})
+    }
+    if(assinatura?.plano === 'Plano Pro' && data === 15) {
+    
+      return res.status(426).json({success: false, message: 'Não é possível subir o video pois você já chegou ao limite do seu plano'})
+    }
+
+    next()
 }
 
 const upload = videoUpload.single('video')
 routes.get('/get/:id_user', VideoController.obterVideoPorIdUser)
 routes.post('/get-aws', handleAwsS3)
 routes.get('/get-by-id/:id_video', VideoController.obterVideoPorId)
-routes.post('/upload-video/:id_user', /* verifyVideoUser, */  upload, handleSavePrint,VideoController.cadastrarVideos)
+routes.post('/upload-video/:id_user', verifyVideoUser, upload, handleSavePrint,VideoController.cadastrarVideos)
 routes.patch('/upload-image/:id_video', imageUpload.single('thumb'), VideoController.uploadImage)
 routes.patch('/upload/:id_video', VideoController.updateVideos)
 routes.delete('/delete/:id_video', VideoController.excluirVideo)
