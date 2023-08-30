@@ -15,7 +15,14 @@ app.use( (req, res, next) => {
     next()
 })
 
-app.use(cors())
+const corsOptions ={
+    origin:'http://localhost:5500', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
+app.use(cors(corsOptions))
+
+/* app.use(cors()) */
 app.use(compress())
 
 app.use((req, res, next) => {
