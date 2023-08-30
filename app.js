@@ -16,7 +16,7 @@ app.use( (req, res, next) => {
 })
 
 const corsOptions ={
-    origin:'http://localhost:5500', 
+    origin:'*', 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
